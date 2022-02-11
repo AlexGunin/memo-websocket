@@ -1,1 +1,2 @@
-export const socket = new WebSocket('ws://localhost:8080');
+const HOST = window.location.origin.replace('/^http/', 'ws');
+export const socket = new WebSocket(HOST);
