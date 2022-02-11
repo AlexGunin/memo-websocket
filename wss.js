@@ -3,11 +3,12 @@ const axios = require('axios');
 const { User, Room } = require('./db/models');
 
 const decoder = new TextDecoder('utf-8');
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 52341 });
 const games = new Map();
 const rooms = {};
 
 wss.on('connection', (socket, req) => {
+  console.log('connection');
   socket.on('message', async (info) => {
     const { type, data } = JSON.parse(decoder.decode(new Uint8Array(info)));
     const {
