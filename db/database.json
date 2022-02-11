@@ -1,0 +1,13 @@
+{
+  "development": {
+    "use_env_variable": "DB_CONNECT"
+  },
+  "production": {
+    "use_env_variable": "DB_CONNECT",
+    "dialectOptions": {
+      "ssl": {
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}
