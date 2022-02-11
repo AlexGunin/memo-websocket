@@ -1,0 +1,26 @@
+<script src="/js/room-chat.js"
+        type="module"></script>
+
+<h2>Hello friend</h2>
+<div class="users"
+     data-id="{{userId}}">
+  {{#each room.Users}}
+  <div class="user"
+       data-id="{{this.id}}">
+    <span>{{this.name}}</span>
+    <div class="form-check">
+      <input class="form-check-input start"
+             id="checkbox-state"
+             type="checkbox"
+             value="">
+      <label class="form-check-label"
+             for="checkbox-state">
+        Готов
+      </label>
+    </div>
+  </div>
+
+  {{/each}}
+</div>
+
+<span></span>

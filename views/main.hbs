@@ -1,0 +1,100 @@
+<script
+      src="/js/mainPage.js"
+      type="module"></script>
+
+
+<div class="container">
+  <button class="btn-create"
+          data-bs-target="#exampleModal"
+          data-bs-toggle="modal"
+          type="button">
+    Создать комнату
+  </button>
+  <div class="active-rooms">
+    <table class="table-rooms"
+           data-userid="{{userId}}">
+      <thead>
+      <th>Номер комнаты</th>
+      <th>Пароль</th>
+      <th>Кол-во игроков</th>
+      <th>Статус</th>
+      <th></th>
+      </thead>
+      <tbody>
+      {{#each allRooms}}
+      <tr data-id="{{this.id}}">
+        <td>{{this.number}}</td>
+        <td>{{this.password}}</td>
+        <td>{{this.Users.length}}</td>
+        <td>{{this.isStarted}}</td>
+        <td>
+          <button class="btn btn-success enter"
+                  type="button">Войти
+          </button>
+        </td>
+      </tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div aria-hidden="true"
+     aria-labelledby="exampleModalLabel"
+     class="modal fade"
+     id="exampleModal"
+     tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="exampleModalLabel">Введите данные о комнате</h5>
+        <button aria-label="Close"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                type="button"></button>
+      </div>
+      <div class="modal-body">
+        <form class="modal-form">
+
+          <div class="form-floating">
+            <input class="form-control"
+                   id="roomNumber"
+                   name="roomNumber"
+                   placeholder="Номер комнаты"
+                   required
+                   type="text">
+            <label for="roomNumber">Номер комнаты</label>
+          </div>
+          <div class="form-floating">
+            <input class="form-control"
+                   id="password"
+                   name="password"
+                   placeholder="Пароль для входа"
+                   type="password">
+            <label for="password">Пароль для входа</label>
+            <button class="btn btn-info btn-tooltip"
+                    data-bs-placement="top"
+                    data-bs-toggle="tooltip"
+                    title="Если оставить поле пустым, то в комнату сможет зайти любой желающий"
+                    type="button">
+              ?
+            </button>
+          </div>
+          <div class="form-controls">
+            <button class="btn btn-warning"
+                    type="reset">Очистить
+            </button>
+            <button class="btn btn-primary"
+
+                    type="submit"> Создать
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
