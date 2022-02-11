@@ -53,6 +53,7 @@ checkboxStart.addEventListener('input', (event) => {
 });
 
 socket.onopen = function (event) {
+  console.log('open');
   socket.send(JSON.stringify({ type: 'ROOM:UPDATE', data: { roomNumber, userId: USER_ID, ready: false } }));
 };
 socket.onmessage = function (message) {
