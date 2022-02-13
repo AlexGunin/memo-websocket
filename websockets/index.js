@@ -115,14 +115,12 @@ const webSocket = function (expressServer) {
           const currentScore = game.get('points');
           const currentUser = currentScore.filter((item) => item.currentTurn)[0];
           const currentTurn = currentUser.id;
-          let currentOpen = game.get('currentOpen');
           if (!game.has('currentOpen')) {
             game.set('currentOpen', [cardId]);
-            currentOpen = game.get('currentOpen');
           } else {
-            game.set('currentOpen', [...currentOpen, cardId]);
-            currentOpen = game.get('currentOpen');
+            game.get('currentOpen').push(cardId);
           }
+          const currentOpen = game.get('currentOpen');
           const urlImages = new Set(currentOpen.map((item) => game.get('data')[item]));
           if (currentOpen.length === 2) {
             if (urlImages.size === 1) {

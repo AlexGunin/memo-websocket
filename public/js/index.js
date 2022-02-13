@@ -4,11 +4,15 @@ import { View } from './view.js';
 import { socket } from './socket.js';
 
 const gameContainer = document.querySelector('.game-container');
-gameContainer.onclick = game;
+const GAME_ID = window.location.pathname.split('/').slice(-1)[0];
 const USER_ID = gameContainer.dataset.id;
 const nav = document.querySelector('.nav');
 const scoreTable = document.querySelector('.score-table');
 const arrowDown = document.querySelector('.arrow-down');
+const ALL_IMAGES = [];
+const controller = new Controller({ model: new Model(), view: new View() });
+nav.remove();
+
 arrowDown.addEventListener('mouseenter', () => {
   scoreTable.classList.add('show');
 });
@@ -24,13 +28,17 @@ function updateScoreTable(data) {
   });
 }
 
-let ALL_IMAGES = [];
-nav.remove();
+function checkFinishGame(data) {
+  const allGuessCard = data.reduce((acc, cur) => acc.score + cur.score);
+  if (allGuessCard === ALL_IMAGES.length / 2) {
+    fetch(`/room/${GAME_ID}`, {
+      method: 'PATCH',
+    });
+  }
+}
 
 // const square = window.innerWidth * window.innerHeight - (0.04 * Math.min(innerWidth, innerHeight) * (innerWidth + innerHeight));
 // const AMOUNT = Math.floor(square / (0.015 * Math.max(innerWidth, innerHeight) * Math.max(innerWidth, innerHeight)));
-
-const controller = new Controller({ model: new Model(), view: new View() });
 
 function getUniqueGameId() {
   const pathname = window.location.pathname.split('/');
@@ -50,7 +58,7 @@ socket.onmessage = (res) => {
   switch (result.type) {
     case 'BOARD:GENERATE':
       gameContainer.innerHTML = controller.model.createCards(game);
-      ALL_IMAGES = game;
+      ALL_IMAGES.push(...game);
       controller.view.animateAppearCard(gameContainer);
       updateScoreTable(currentScore);
       clickHandler(currentTurn);
@@ -63,6 +71,7 @@ socket.onmessage = (res) => {
     case 'GUESS':
       clickHandler(0);
       updateScoreTable(currentScore);
+      checkFinishGame(currentScore);
       setTimeout(() => {
         makeGuess(cardsId);
         clickHandler(currentTurn);
