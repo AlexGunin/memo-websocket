@@ -24,9 +24,10 @@ function closeAlert(wrapper, event) {
 }
 
 function createRow(obj) {
+  console.log(obj);
   const row = document.createElement('tr');
   row.setAttribute('data-id', obj.id);
-  row.innerHTML = `<td>${obj.number}</td><td>${obj.password}</td><td>${obj.User?.length ?? 0}</td><td>${obj.isStarted}</td>    <td>
+  row.innerHTML = `<td>${obj.number}</td><td>${obj.password}</td><td>${obj.Users?.length ?? 0}</td><td>${obj.isStarted}</td>    <td>
           <button type="button" class="btn btn-success enter">Войти</button>
         </td>`;
   return row;

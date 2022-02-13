@@ -15,8 +15,9 @@ export class Model {
   createCards(arr) {
     const result = arr.map((image, index) => `
   <div class="game-card" data-id="${index}">
-      <div class="front image-wrap"></div>
+      <div class="front image-game"></div>
       <div class = "back image-wrap">
+        <img class = "image-game" src ="" alt="Изображение для игры">
       </div>
   </div>
     `);

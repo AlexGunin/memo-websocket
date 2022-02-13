@@ -6,7 +6,7 @@ html {
 
 body {
   font: max(12px, 2vmin) "Lucida Grande", Helvetica, Arial, sans-serif;
-  background: #004e92;
+  background: black;
   height: 100%;
   width: 100%;
 }
@@ -100,34 +100,34 @@ body {
 
 .game-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10vmax, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12vmax, 1fr));
+  grid-template-rows: auto;
   grid-auto-flow: dense;
-  padding: 2vmin;
-  gap: 20px;
+  padding: 1vmax;
+  gap: 2vmax;
   perspective: 600px;
   perspective-origin: center;
   transition: all 1s ease-in-out;
-}
-
-.image-wrap {
-  background: no-repeat center center;
-  background-size: cover;
-}
-
-.front {
-  background: url("/img/front.png") no-repeat center center;
+  height: 100vh;
 }
 
 .front, .back {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   backface-visibility: hidden;
   overflow: hidden;
   transition: all 0.5s ease-in-out;
   border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.front {
+  background: #FF512F;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #F09819, #FF512F);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #9b825f, #7160b3);
 }
 
 .back {
@@ -135,7 +135,7 @@ body {
 }
 
 .image-wrap > img {
-  max-width: 100%;
+  width: 100%;
   height: auto;
 }
 
@@ -146,8 +146,6 @@ body {
   display: flex;
   flex-direction: column;
   word-wrap: break-word;
-  max-width: 100%;
-  min-height: 10vmax;
   border-radius: 20px;
   cursor: pointer;
   transform-style: preserve-3d;

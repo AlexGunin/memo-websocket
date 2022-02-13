@@ -77,9 +77,9 @@ function makeGuess(arr) {
 
 function resetBoard() {
   gameContainer.querySelectorAll('.game-card.show').forEach((card) => {
-    const back = card.querySelector('.back');
+    const back = card.querySelector('.back > .image-game');
     setTimeout(() => {
-      back.style.backgroundImage = '';
+      back.src = '';
     }, 500);
     card.classList.remove('show');
   });
@@ -89,16 +89,18 @@ function changeStateBoard({ cardId, image }) {
   const showCards = gameContainer.querySelectorAll('.game-card.show');
   if (showCards.length < 2) {
     const card = gameContainer.querySelector(`.game-card[data-id="${cardId}"]`);
-    const back = card.querySelector('.back');
-    back.style.backgroundImage = `url("${image}")`;
-    card.classList.add('show');
+    const back = card.querySelector('.back > .image-game');
+    back.src = `${image}`;
+    back.onload = () => {
+      card.classList.add('show');
+    };
   }
 }
 
 function game(event) {
   event.preventDefault();
   console.log(event.target);
-  if (event.target.classList.contains('image-wrap')) {
+  if (event.target.classList.contains('image-game')) {
     const gameCard = event.target.closest('.game-card');
     const cardId = gameCard.dataset.id;
     socket.send(JSON.stringify({ type: 'PLAY', data: { gameId: getUniqueGameId(), cardId } }));

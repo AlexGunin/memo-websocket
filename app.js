@@ -1,18 +1,22 @@
+require('dotenv').config();
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-require('dotenv').config();
+
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
-const wss = require('./wss');
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 
+const webSocket = require('./websockets');
+
 const app = express();
-const PORT = process.env.PORT ?? 3000;
-// view engine setup
+const PORT = process.env.WS_PORT ?? 3000;
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
@@ -55,4 +59,4 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
-app.listen(PORT);
+webSocket(app.listen(PORT));
