@@ -92,16 +92,18 @@ function changeStateBoard({ cardId, image }) {
     const card = gameContainer.querySelector(`.game-card[data-id="${cardId}"]`);
     const back = card.querySelector('.back > .image-game');
     back.src = `${ALL_IMAGES[cardId]}`;
-    back.onload = () => {
+    setTimeout(() => {
       card.classList.add('show');
-    };
+    }, 0);
   }
 }
 
 function game(event) {
   event.preventDefault();
-  console.log(event.target);
-  if (event.target.classList.contains('image-game')) {
+  const isImageGame = event.target.classList.contains('image-game');
+  const isShowedCard = event.target.closest('.game-card').classList.contains('show');
+
+  if (isImageGame && !isShowedCard) {
     const gameCard = event.target.closest('.game-card');
     const cardId = gameCard.dataset.id;
     socket.send(JSON.stringify({ type: 'PLAY', data: { gameId: getUniqueGameId(), cardId } }));

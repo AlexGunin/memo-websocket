@@ -67,5 +67,8 @@ socket.onmessage = function (message) {
         window.location.href = `/prepare/${roomNumber}`;
       }, 500 * USER_ID);
       break;
+    case 'CHOICE:THEME':
+
+      break;
   }
 };
