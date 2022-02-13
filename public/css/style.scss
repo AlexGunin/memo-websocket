@@ -115,9 +115,11 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 .fit-content {
   width: fit-content;
 }
+
 .form-wrap {
   min-width: 40%;
   display: flex;
@@ -126,6 +128,7 @@ body {
 }
 
 .game-container {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12vmax, 1fr));
   grid-template-rows: auto;
@@ -136,6 +139,71 @@ body {
   perspective-origin: center;
   transition: all 1s ease-in-out;
   height: 100vh;
+
+  &.active {
+    background: #95ff9529;
+    box-shadow: inset 0px 0px 10px 2px #ffffffa6;
+  }
+}
+
+.arrow-down {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url('/img/arrow-down-3-svgrepo-com.svg') no-repeat center;
+  background-size: cover;
+  width: 2vmax;
+  height: 2vmax;
+  cursor: pointer;
+  transform: translate(-25%, -25%) rotate(-45deg);
+}
+
+.score-table {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #20255cb8;
+  min-width: 20%;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  gap: 40px;
+  box-shadow: inset 0px 0px 10px 2px #ffffff9e;
+  transition: all 0.7s ease-in-out;
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    top: 2%;
+  }
+
+  .score-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+
+    .player {
+      font-size: 2vmax;
+    }
+
+    .score {
+      background: bisque;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 40px;
+      border-radius: 20px;
+      color: black;
+      font-size: 3vmax;
+      font-weight: bold;
+    }
+  }
 }
 
 
@@ -332,9 +400,11 @@ body {
   from {
     transform: scale(1);
     opacity: 1;
+    visibility: visible;
   }
   to {
     transform: scale(0);
     opacity: 0;
+    visibility: hidden;
   }
 }

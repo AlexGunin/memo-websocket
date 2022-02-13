@@ -7,6 +7,23 @@ const gameContainer = document.querySelector('.game-container');
 gameContainer.onclick = game;
 const USER_ID = gameContainer.dataset.id;
 const nav = document.querySelector('.nav');
+const scoreTable = document.querySelector('.score-table');
+const arrowDown = document.querySelector('.arrow-down');
+arrowDown.addEventListener('mouseenter', () => {
+  scoreTable.classList.add('show');
+});
+arrowDown.addEventListener('mouseleave', () => {
+  scoreTable.classList.remove('show');
+});
+
+function updateScoreTable(data) {
+  const scoreWrap = scoreTable.querySelectorAll('.score-wrap');
+  scoreWrap.forEach((item, index) => {
+    item.querySelector('.score').innerText = data[index].score;
+    item.querySelector('.player').innerText = data[index].name;
+  });
+}
+
 let ALL_IMAGES = [];
 nav.remove();
 
@@ -27,7 +44,7 @@ socket.onopen = function () {
 socket.onmessage = (res) => {
   const result = JSON.parse(res.data);
   const {
-    game, currentTurn, cardId, cardsId, image,
+    game, currentTurn, cardId, cardsId, image, currentScore,
   } = result.data;
 
   switch (result.type) {
@@ -35,30 +52,42 @@ socket.onmessage = (res) => {
       gameContainer.innerHTML = controller.model.createCards(game);
       ALL_IMAGES = game;
       controller.view.animateAppearCard(gameContainer);
-      disableClick(currentTurn);
+      updateScoreTable(currentScore);
+      clickHandler(currentTurn);
+      changeBG(currentTurn);
       break;
     case 'PLAY':
       changeStateBoard({ cardId, image });
+      changeBG(currentTurn);
       break;
     case 'GUESS':
-      disableClick(0);
+      clickHandler(0);
+      updateScoreTable(currentScore);
       setTimeout(() => {
         makeGuess(cardsId);
-        disableClick(currentTurn);
-      }, 1000);
+        clickHandler(currentTurn);
+      }, 2000);
       break;
     case 'NEXT:TURN':
-      disableClick(0);
+      clickHandler(0);
       setTimeout(() => {
         resetBoard();
-        disableClick(currentTurn);
+        changeBG(currentTurn);
+        clickHandler(currentTurn);
       }, 2000);
       break;
   }
 };
 
-function disableClick(id) {
-  console.log(id, +USER_ID);
+function changeBG(id) {
+  if (id !== +USER_ID) {
+    gameContainer.classList.remove('active');
+  } else if (!gameContainer.classList.contains('active')) {
+    gameContainer.classList.add('active');
+  }
+}
+
+function clickHandler(id) {
   if (id !== +USER_ID) {
     gameContainer.onclick = null;
     return;

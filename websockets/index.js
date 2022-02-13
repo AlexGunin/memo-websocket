@@ -82,14 +82,14 @@ const webSocket = function (expressServer) {
 
             const usersScore = [...room.Users].map((user) => ({
               id: user.id,
+              name: user.name,
               score: 0,
               currentTurn: user.id === randomIndex,
             }));
-            const choicedTheme = rooms[room.id].theme || 'nature';
-            const choicedLanguage = rooms[room.id].language.trim().toLowerCase() || 'en';
-            console.log('choicedTheme', choicedTheme);
-            const URL = `https://pixabay.com/api/?key=18272099-9836086b8f8ca37bb957d4294&q=${choicedTheme.split(' ').join('+')}&lang=${choicedLanguage}&image_type=photo&orientation=horizontal`;
-            console.log(URL);
+            const choicedTheme = rooms[room.id]?.theme || 'nature';
+            const encodeTheme = encodeURI(choicedTheme.split(' ').join('+'));
+            const choicedLanguage = rooms[room.id]?.language || 'en';
+            const URL = `https://pixabay.com/api/?key=18272099-9836086b8f8ca37bb957d4294&q=${encodeTheme}&lang=${choicedLanguage.trim().toLowerCase()}&image_type=photo&orientation=horizontal`;
             const pixabay = await axios.get(URL);
             const response = pixabay.data.hits.map((item) => item.webformatURL).sort(() => Math.random() - 0.5).slice(0, 14);
             const game = response.concat(response).sort(() => Math.random() - 0.5);
@@ -98,21 +98,22 @@ const webSocket = function (expressServer) {
               ['data', game],
               ['points', usersScore],
             ]));
-            const currentTurn = games.get(gameId).get('points').filter((item) => item.currentTurn)[0].id;
+            const currentScore = games.get(gameId).get('points');
+            const currentTurn = currentScore.filter((item) => item.currentTurn)[0].id;
             wss.clients.forEach((client) => {
-              client.send(JSON.stringify({ type: 'BOARD:GENERATE', data: { game, currentTurn } }));
+              client.send(JSON.stringify({ type: 'BOARD:GENERATE', data: { game, currentTurn, currentScore } }));
             });
           } else {
             const game = games.get(gameId).get('data');
-            const currentTurn = games.get(gameId).get('points').filter((item) => item.currentTurn)[0].id;
-            socket.send(JSON.stringify({ type: 'BOARD:GENERATE', data: { game, currentTurn } }));
+            const currentScore = games.get(gameId).get('points');
+            const currentTurn = currentScore.filter((item) => item.currentTurn)[0].id;
+            socket.send(JSON.stringify({ type: 'BOARD:GENERATE', data: { game, currentTurn, currentScore } }));
           }
           break;
         case 'PLAY':
           const game = games.get(gameId);
-          const state = game.get('points');
-          console.log(state);
-          const currentUser = state.filter((item) => item.currentTurn)[0];
+          const currentScore = game.get('points');
+          const currentUser = currentScore.filter((item) => item.currentTurn)[0];
           const currentTurn = currentUser.id;
           let currentOpen = game.get('currentOpen');
           if (!game.has('currentOpen')) {
@@ -127,11 +128,11 @@ const webSocket = function (expressServer) {
             if (urlImages.size === 1) {
               currentUser.score += 1;
               wss.clients.forEach((client) => {
-                client.send(JSON.stringify({ type: 'GUESS', data: { cardsId: currentOpen, currentTurn } }));
+                client.send(JSON.stringify({ type: 'GUESS', data: { cardsId: currentOpen, currentScore, currentTurn } }));
               });
               game.set('currentOpen', []);
             } else {
-              const userTurn = state.filter((user) => !user.currentTurn)[0].id;
+              const userTurn = currentScore.filter((user) => !user.currentTurn)[0].id;
               game.get('points').forEach((item) => {
                 item.currentTurn = !item.currentTurn;
               });
