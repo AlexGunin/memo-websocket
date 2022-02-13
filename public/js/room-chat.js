@@ -5,6 +5,27 @@ const checkboxStart = document.querySelector(`.user[data-id="${USER_ID}"] .start
 const divUsers = document.querySelector('.users');
 const splitPathName = window.location.pathname.split('/');
 const roomNumber = splitPathName[splitPathName.length - 1];
+const inputTheme = document.querySelector('#theme-value');
+const selectLanguage = document.querySelector('.language');
+
+const languages = {
+  default: /.*/gi,
+  ru: /[^а-яА-Я]/gi,
+  en: /[^a-zA-Z]/gi,
+};
+
+disabledForeignCheckbox();
+
+function getLanguages() {
+  return selectLanguage.value;
+}
+
+selectLanguage.addEventListener('change', sendLanguage);
+
+function sendLanguage(event) {
+  const language = event.target.value;
+  socket.send(JSON.stringify({ type: 'LANGUAGE:UPDATE', data: { roomNumber, language } }));
+}
 
 function disabledForeignCheckbox() {
   const users = divUsers.querySelectorAll('.user');
@@ -45,7 +66,20 @@ function changeStatePlayer(arr) {
   disabledForeignCheckbox();
 }
 
-disabledForeignCheckbox();
+function changeStateTheme(value) {
+  inputTheme.value = value;
+}
+
+function sendTheme(event) {
+  const themeValue = event.target.value.replace(languages[getLanguages()], '');
+  console.log(themeValue);
+  if (themeValue) {
+    return socket.send(JSON.stringify({ type: 'THEME:UPDATE', data: { roomNumber, themeValue } }));
+  }
+  event.target.value = '';
+}
+
+inputTheme.addEventListener('input', sendTheme);
 
 checkboxStart.addEventListener('input', (event) => {
   const ready = event.target.checked;
@@ -53,22 +87,27 @@ checkboxStart.addEventListener('input', (event) => {
 });
 
 socket.onopen = function (event) {
-  console.log('open');
   socket.send(JSON.stringify({ type: 'ROOM:UPDATE', data: { roomNumber, userId: USER_ID, ready: false } }));
 };
 socket.onmessage = function (message) {
   const decodedInfo = JSON.parse(message.data);
-  switch (decodedInfo.type) {
+  const { data, type } = decodedInfo;
+  switch (type) {
     case 'UPDATE':
-      changeStatePlayer(decodedInfo.data);
+      changeStatePlayer(data);
+      break;
+    case 'THEME:UPDATE':
+      console.log('themeValue', data.themeValue);
+      changeStateTheme(data.themeValue);
+      break;
+    case 'LANGUAGE:UPDATE':
+      selectLanguage.value = data.language;
       break;
     case 'READY':
+      inputTheme.removeEventListener('input', sendTheme);
       setTimeout(() => {
         window.location.href = `/prepare/${roomNumber}`;
       }, 500 * USER_ID);
-      break;
-    case 'CHOICE:THEME':
-
       break;
   }
 };

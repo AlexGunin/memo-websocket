@@ -76,8 +76,6 @@ form.addEventListener('submit', async (event) => {
     return alert(form, result.error);
   }
   const modal = form.closest('.modal-dialog');
-  console.log(result);
-  table.append(createRow(result.newRoom));
   modal.querySelector('.btn-close').click();
 });
 

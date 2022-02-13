@@ -110,6 +110,21 @@ body {
   }
 }
 
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fit-content {
+  width: fit-content;
+}
+.form-wrap {
+  min-width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .game-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12vmax, 1fr));

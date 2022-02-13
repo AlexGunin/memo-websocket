@@ -17,10 +17,11 @@ const webSocket = function (expressServer) {
   });
   wss.on('connection', (socket, req) => {
     console.log('connection');
+    console.log(rooms);
     socket.on('message', async (info) => {
       const { type, data } = JSON.parse(decoder.decode(new Uint8Array(info)));
       const {
-        roomNumber, userId, ready, gameId, cardId,
+        roomNumber, userId, ready, gameId, cardId, themeValue, language,
       } = data;
       switch (type) {
         case 'ROOM:UPDATE':
@@ -31,28 +32,48 @@ const webSocket = function (expressServer) {
               userId: user.id,
               ready: false,
             }));
-            rooms[roomNumber] = stateUsers;
+            rooms[roomNumber] = { users: stateUsers, theme: '', language: 'default' };
           }
-          const indexUser = rooms[roomNumber].findIndex((el) => el.userId === +userId);
+          const roomUsers = rooms[roomNumber].users;
+          const indexUser = roomUsers.findIndex((el) => el.userId === +userId);
           if (indexUser > -1) {
-            rooms[roomNumber][indexUser].ready = ready;
+            roomUsers[indexUser].ready = ready;
           } else {
             const newUser = await User.findByPk(userId);
-            rooms[roomNumber].push({
+            roomUsers.push({
               name: newUser.name,
               userId: +userId,
               ready: false,
             });
           }
-          const readyness = rooms[roomNumber].map((user) => user.ready).every(Boolean);
+          const readyness = roomUsers.map((user) => user.ready).every(Boolean);
           wss.clients.forEach((client) => {
-            client.send(JSON.stringify({ type: 'UPDATE', data: rooms[roomNumber] }));
+            client.send(JSON.stringify({ type: 'UPDATE', data: roomUsers }));
           });
-          if (readyness && rooms[roomNumber].length > 1) {
+          if (readyness && roomUsers.length > 1) {
             wss.clients.forEach((client) => {
               client.send(JSON.stringify({ type: 'READY', data: true }));
             });
           }
+          break;
+        case 'THEME:UPDATE':
+          rooms[roomNumber].theme = themeValue;
+          console.log(rooms[roomNumber].theme);
+          console.log(rooms[roomNumber]);
+          wss.clients.forEach((client) => {
+            if (client !== socket && client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type: 'THEME:UPDATE', data: { themeValue } }));
+            }
+          });
+          break;
+        case 'LANGUAGE:UPDATE':
+          rooms[roomNumber].language = language;
+          console.log(rooms[roomNumber]);
+          wss.clients.forEach((client) => {
+            if (client !== socket && client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type: 'LANGUAGE:UPDATE', data: { language } }));
+            }
+          });
           break;
         case 'BOARD:GENERATE':
           if (!games.has(gameId)) {
@@ -64,11 +85,14 @@ const webSocket = function (expressServer) {
               score: 0,
               currentTurn: user.id === randomIndex,
             }));
-            // const response = await axios.get('https://dog.ceo/api/breeds/image/random/15');
-            const pixabay = await axios.get('https://pixabay.com/api/?key=18272099-9836086b8f8ca37bb957d4294&image_type=photo');
+            const choicedTheme = rooms[room.id].theme || 'nature';
+            const choicedLanguage = rooms[room.id].language.trim().toLowerCase() || 'en';
+            console.log('choicedTheme', choicedTheme);
+            const URL = `https://pixabay.com/api/?key=18272099-9836086b8f8ca37bb957d4294&q=${choicedTheme.split(' ').join('+')}&lang=${choicedLanguage}&image_type=photo&orientation=horizontal`;
+            console.log(URL);
+            const pixabay = await axios.get(URL);
             const response = pixabay.data.hits.map((item) => item.webformatURL).sort(() => Math.random() - 0.5).slice(0, 14);
             const game = response.concat(response).sort(() => Math.random() - 0.5);
-            console.log(pixabay.data.hits);
             games.set(gameId, new Map([
               ['started', true],
               ['data', game],
