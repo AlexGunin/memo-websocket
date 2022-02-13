@@ -7,7 +7,7 @@ const gameContainer = document.querySelector('.game-container');
 gameContainer.onclick = game;
 const USER_ID = gameContainer.dataset.id;
 const nav = document.querySelector('.nav');
-
+let ALL_IMAGES = [];
 nav.remove();
 
 // const square = window.innerWidth * window.innerHeight - (0.04 * Math.min(innerWidth, innerHeight) * (innerWidth + innerHeight));
@@ -33,6 +33,7 @@ socket.onmessage = (res) => {
   switch (result.type) {
     case 'BOARD:GENERATE':
       gameContainer.innerHTML = controller.model.createCards(game);
+      ALL_IMAGES = game;
       controller.view.animateAppearCard(gameContainer);
       disableClick(currentTurn);
       break;
@@ -90,7 +91,7 @@ function changeStateBoard({ cardId, image }) {
   if (showCards.length < 2) {
     const card = gameContainer.querySelector(`.game-card[data-id="${cardId}"]`);
     const back = card.querySelector('.back > .image-game');
-    back.src = `${image}`;
+    back.src = `${ALL_IMAGES[cardId]}`;
     back.onload = () => {
       card.classList.add('show');
     };
