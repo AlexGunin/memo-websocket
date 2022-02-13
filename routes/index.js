@@ -15,16 +15,10 @@ router.get('/', async (req, res, next) => {
 router.get('/prepare/:id', gameGenerate, async (req, res) => {
   try {
     const room = await Room.findByPk(req.params.id, { include: [User] });
-    const uniqueId = room.uniqueGameId;
-    if (uniqueId) {
-      req.session.gameId = uniqueId;
-      res.redirect(`/game/${uniqueId}`);
-    } else {
-      const generateId = await uuidv4();
-      await room.update({ uniqueGameId: generateId });
-      req.session.gameId = generateId;
-      res.redirect(`/game/${generateId}`);
-    }
+    const generateId = await uuidv4();
+    await room.update({ uniqueGameId: generateId });
+    req.session.gameId = generateId;
+    res.redirect(`/game/${generateId}`);
   } catch (error) {
     res.json({ error });
   }
